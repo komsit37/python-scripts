@@ -21,6 +21,7 @@ import sys
 import os
 import textwrap
 
+
 def call_gemini(prompt_text, model_name="gemini-2.0-flash"):
     """
     Sends the prompt text to the Gemini API and returns the response.
@@ -40,7 +41,9 @@ def call_gemini(prompt_text, model_name="gemini-2.0-flash"):
         genai.configure(api_key=api_key)
 
         # Add a system instruction for concise answers
-        system_prompt = "Context: Linux. Provide a concise response:\n"
+        system_prompt = (
+            "Context: Linux. Provide a concise response in a raw text format:\n"
+        )
         full_prompt = system_prompt + prompt_text
 
         # Create the model instance
@@ -56,6 +59,7 @@ def call_gemini(prompt_text, model_name="gemini-2.0-flash"):
 
     except Exception as e:
         return f"Error calling Gemini API: {e}"
+
 
 def main():
     """
@@ -73,21 +77,20 @@ def main():
               echo "Summarize this text" | gemini.py
               cat document.txt | gemini.py
               gemini.py < prompt.txt
-            """)
+            """),
     )
 
     # Use nargs='*' to capture all positional arguments as a list
     parser.add_argument(
-        'prompt_parts',
-        nargs='*',
-        help='The prompt text (if not provided, reads from stdin).'
+        "prompt_parts",
+        nargs="*",
+        help="The prompt text (if not provided, reads from stdin).",
     )
     parser.add_argument(
-        '--model',
+        "--model",
         default="gemini-1.5-flash-latest",
-        help='The Gemini model to use (default: gemini-1.5-flash-latest).'
+        help="The Gemini model to use (default: gemini-1.5-flash-latest).",
     )
-
 
     args = parser.parse_args()
 
@@ -98,11 +101,17 @@ def main():
     else:
         # Check if stdin is connected to a terminal (interactive input)
         if sys.stdin.isatty():
-            print("Enter prompt (press Ctrl+D on Linux/macOS or Ctrl+Z then Enter on Windows to end):", file=sys.stderr)
+            print(
+                "Enter prompt (press Ctrl+D on Linux/macOS or Ctrl+Z then Enter on Windows to end):",
+                file=sys.stderr,
+            )
         # Read all data from stdin until EOF
         prompt = sys.stdin.read().strip()
         if not prompt:
-            print("Error: No prompt provided either as argument or via stdin.", file=sys.stderr)
+            print(
+                "Error: No prompt provided either as argument or via stdin.",
+                file=sys.stderr,
+            )
             parser.print_help(sys.stderr)
             sys.exit(1)
 
@@ -115,6 +124,7 @@ def main():
     # Exit with error code if the result indicates an error
     if result.lower().startswith("error:"):
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
